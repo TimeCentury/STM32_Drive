@@ -13,6 +13,8 @@ EEPROM_TypeDef EEPROM = {
 	},
 };
 
+extern void Delay_MS(uint32_t nTime);
+
 /** 
  * @brief Œ¢√Îº∂—” ±
  * @param uint32_t t
@@ -20,7 +22,7 @@ EEPROM_TypeDef EEPROM = {
  */
 static __inline void Delay(uint32_t t)
 {
-
+	Delay_MS(t/1000);
 }
 
 /** 
