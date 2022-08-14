@@ -23,12 +23,12 @@ typedef struct
  * @param uint16_t GPIO_PIN GPIO端口引脚
  * @param uint8_t Number 编号，在点击时返回
  */
-void IndependentKey_Add(uint32_t GPIO_CLK, GPIO_TypeDef* GPIO_PORT, uint16_t GPIO_PIN, uint8_t Number);
+extern void IndependentKey_Add(uint32_t GPIO_CLK, GPIO_TypeDef* GPIO_PORT, uint16_t GPIO_PIN, uint8_t Number);
 /** 
  * @brief 扫描按键,应没10ms调用一次
  * @param 
  * @retval 约定返回的低16位为按键按下的编号，高16位bit0为长按标志
  */
-uint32_t IndependentKey_Scan();
+extern uint32_t IndependentKey_Scan();
 
 #endif

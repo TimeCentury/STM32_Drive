@@ -52,10 +52,10 @@ static uint8_t EEPROM_IsBusy(EEPROM_TypeDef *const pEEPROM, uint8_t devAdd)
 uint8_t AT24C0X_StartTransmission(void* self, uint16_t address)
 {
 	EEPROM_TypeDef* pEEPROM = self;
-	uint8_t add = pEEPROM->IIC->ADD | ((address>>8) & ~(0xff << (uint8_t)pEEPROM->Type));
+	uint8_t add = pEEPROM->IIC.ADD | ((address>>8) & ~(0xff << (uint8_t)pEEPROM->Type));
 	if(EEPROM_IsBusy(pEEPROM, add))
 		return 1;
-	if (IIC_SendAndSack(pEEPROM->IIC, address & 0xFF))
+	if (IIC_SendAndSack(&pEEPROM->IIC, address & 0xFF))
 		return 2;
 	return 0;
 }

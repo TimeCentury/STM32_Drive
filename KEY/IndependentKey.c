@@ -16,7 +16,7 @@ static __inline uint8_t Key_GPIO_Read(IndependentKey_TypeDef * const pKey)
  * @param uint16_t GPIO_PIN GPIO端口引脚
  * @param uint8_t Number 编号，在点击时返回
  */
-void IndependentKey_Add(uint32_t GPIO_CLK, GPIO_TypeDef* GPIO_PORT; uint16_t GPIO_PIN, uint8_t Number)
+void IndependentKey_Add(uint32_t GPIO_CLK, GPIO_TypeDef* GPIO_PORT, uint16_t GPIO_PIN, uint8_t Number)
 {	
 	RCC->AHB1ENR |= GPIO_CLK; //开启时钟
 	GPIO_PORT->MODER &= ~(0x00000003 << GPIO_PIN * 2);//设置为输入
