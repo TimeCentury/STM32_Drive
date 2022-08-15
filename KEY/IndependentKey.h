@@ -35,6 +35,6 @@ extern void IndependentKey_Add(uint32_t GPIO_CLK, GPIO_TypeDef* GPIO_PORT, uint1
  * @param 
  * @retval 约定返回的低8位为按键按下的编号，高8位bit0为长按标志
  */
-extern uint16_t IndependentKey_Scan();
+extern uint16_t IndependentKey_Scan(void);
 
 #endif

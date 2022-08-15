@@ -8,6 +8,7 @@
 
 #include "stm32f4xx.h"
 
+//包含控制IO口的必要条件
 typedef struct 
 {
     uint32_t		GPIO_CLK;

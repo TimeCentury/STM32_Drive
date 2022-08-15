@@ -1,12 +1,10 @@
 /** 
  * @Author: 时间世纪
  * @Date: 2022-08-15 15:53:26
- * @LastEditTime: 2022-08-15 19:21:01
- * @LastEditors: your name
  * @Description: 模拟串口,应定时调用UART_S_ReadDrive，UART_S_SendDrive函数，
  * UART_S_SendDrive定时时间为 1秒 / 想要的波特率
  * UART_S_ReadDrive定时时间为 1秒 / 想要的波特率 / 3，除3是因为对1bit要进行三次采样以次数多的为准，如三次采样中高电平次数为2次，则为高电平
- * 否则为低电平，进行三次采样的原因为防止采样点落在bit的边缘上，而进行三次采样即使有一次落在边缘上也可以保证数据的准确性
+ * 否则为低电平，进行三次采样的原因为防止采样点落在bit的边缘上，而进行三次采样即使有一次落在边缘上也可以保证数据的准确性，不建议超过9600波特率
  * 如想要9600波特率，则定时时间为1秒 / 9600 / 3 = 34.7us，所以UART_S_ReadDrive为每34us调用一次，UART_S_SendDrive为每102us调用一次
  * 如果想要4800波特率，则定时时间为1秒 / 4800 / 3 = 69.4us，所以UART_S_ReadDrive为每69us调用一次，UART_S_SendDrive为每207us调用一次
  * 如果想要1200波特率，则定时时间为1秒 / 1200 / 3 = 277.7us，所以UART_S_ReadDrive为每277us调用一次，UART_S_SendDrive为每831us调用一次
@@ -24,13 +22,14 @@ typedef struct
 {
     HAL_GPIO_TypeDef TX;
     HAL_GPIO_TypeDef RX;
-    uint16_t RxState : 4;//发送状态
+    uint16_t RxState : 3;//发送状态
     uint16_t RxTestCnt : 3;//读取IO计数
     uint16_t RxHighCnt : 3;//高电平计数
     uint16_t RxBitCnt : 4;//接收位计数
+    uint16_t RxReserve : 3;//保留
     uint8_t RxData;//接收数据
-    uint16_t TxState : 4;//发送状态
-    uint16_t TxBitCnt : 4;//发送位计数
+    uint8_t TxState : 3;//发送状态
+    uint8_t TxBitCnt : 4;//发送位计数
     uint8_t TxBusy : 1;//发送忙标志
     uint8_t TxData;//发送数据
     uint8_t *TxBuf;//发送缓冲区

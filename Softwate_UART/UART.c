@@ -1,18 +1,24 @@
 #include "UART.h"
 
 /**
- * @brief:
+ * @brief 初始化一个模拟串口
  * @param UART_S_TypeDef *pUART
- * @param uint8_t *TxBuf
- * @param uint8_t TxBufLen
+ * @param uint8_t *TxBuf 发送缓冲区
+ * @param uint8_t TxBufLen 发送缓冲区长度
  * @retval:
  */
 void UART_S_Init(UART_S_TypeDef *const pUART, uint8_t *TxBuf, uint8_t TxBufLen)
 {
-    HAL_GPIO_Init(&pUART->RX);
-    HAL_GPIO_Init(&pUART->TX);
-    HAL_GPIO_SetInput(&pUART->RX);
-    HAL_GPIO_SetOutput(&pUART->TX);
+    if(pUART->TX != 0)
+    {
+        HAL_GPIO_Init(&pUART->TX);
+        HAL_GPIO_SetOutput(&pUART->TX);
+    }
+    if(pUART->RX != 0)
+    {
+        HAL_GPIO_Init(&pUART->RX);
+        HAL_GPIO_SetInput(&pUART->RX);
+    }
     pUART->RxState = 0;
     pUART->RxTestCnt = 0;
     pUART->RxHighCnt = 0;
@@ -26,6 +32,34 @@ void UART_S_Init(UART_S_TypeDef *const pUART, uint8_t *TxBuf, uint8_t TxBufLen)
     pUART->TxBufDataCnt = 0;
     pUART->TxBuf = TxBuf;
     pUART->TxBufLen = TxBufLen;
+}
+
+/** 
+ * @brief 换相变换RX、TX，可能导致未知风险，使用场景为一根线通信时将其中一个设置为0，另一个设置为IO口
+ * @param UART_S_TypeDef *pUART
+ * @retval
+ */
+static void UART_S_ChangeIO(UART_S_TypeDef * const pUART)
+{
+    HAL_GPIO_TypeDef temp;
+    temp = pUART->RX;
+    pUART->RX = pUART->TX;
+    pUART->TX = temp;
+    if(pUART->TX != 0)
+        HAL_GPIO_SetOutput(&pUART->TX);
+    if(pUART->RX != 0)
+        HAL_GPIO_SetInput(&pUART->RX);
+    pUART->RxState = 0;//重置状态
+    pUART->RxTestCnt = 0;
+    pUART->RxHighCnt = 0;
+    pUART->RxBitCnt = 0;
+    pUART->RxData = 0;
+    pUART->TxState = 0;
+    pUART->TxBitCnt = 0;
+    pUART->TxBusy = 0;
+    pUART->TxHeadIndex = 0;
+    pUART->TxTailIndex = 0;
+    pUART->TxBufDataCnt = 0;
 }
 
 /**
@@ -128,7 +162,7 @@ void UART_S_ReadDrive(UART_S_TypeDef *const pUART)
     switch (pUART->RxState)
     {
     case 0:
-        if (HAL_GPIO_Read(&pUART->RX) == 0) //检测到开始位
+        if (pUART->RX != 0 && HAL_GPIO_Read(&pUART->RX) == 0) //检测到开始位
         {
             pUART->RxState = 1;
         }
