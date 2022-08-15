@@ -22,11 +22,11 @@ void IndependentKey_Add(uint32_t GPIO_CLK, GPIO_TypeDef* GPIO_PORT, uint16_t GPI
 		LOG_ERROR("IndependentKey_Add: KeyCount > %d", INDEPENDENT_KEY_COUNT);
 		return;
 	}
-	RCC->AHB1ENR |= GPIO_CLK; //¿ªÆôÊ±ÖÓ
 	Keys[KeyCount].Key.GPIO_CLK = GPIO_CLK;
 	Keys[KeyCount].Key.GPIO_PORT = GPIO_PORT;
 	Keys[KeyCount].Key.GPIO_PIN = GPIO_PIN;
 	Keys[KeyCount].Number = Number;
+	HAL_GPIO_Init(&Keys[KeyCount].Key);
 	HAL_GPIO_SetInput(&(Keys[KeyCount].Key));
 	KeyCount++;
 }

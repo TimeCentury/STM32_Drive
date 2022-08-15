@@ -5,10 +5,18 @@
  */
 #include "EEPROM.h"
 
-EEPROM_TypeDef EEPROM = {
+EEPROM_TypeDef EEPROM_AT24C02 = {
 	.IIC = {
 		{RCC_AHB1Periph_GPIOH, GPIOH, 4},
 		{RCC_AHB1Periph_GPIOH, GPIOH, 5},
+		0xA0
+	},
+};
+
+EEPROM_TypeDef EEPROM_AT24C256 = {
+	.IIC = {
+		{RCC_AHB1Periph_GPIOH, GPIOH, 4},
+		{RCC_AHB1Periph_GPIOH, GPIOH, 6},
 		0xA0
 	},
 };

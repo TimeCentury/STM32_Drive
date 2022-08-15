@@ -11,6 +11,11 @@
 
 #define EEPROM_BUSY_CNT 10 //EEPROM忙等待次数
 
+
+extern EEPROM_TypeDef EEPROM_AT24C02;
+extern EEPROM_TypeDef EEPROM_AT24C256;
+
+
 typedef enum
 {
 	AT24C02 = 0,
@@ -34,8 +39,6 @@ typedef struct
 	//因为EEPROM器件型号不同启动传输的操作也有所不同，所以使用的启动方式也有所不同，如AT24C04在启动一次传输时需要占用一个bit的器件地址做寻址地址
 	uint8_t (*EEPROM_StartTransmission)(void* self, uint16_t address);
 } EEPROM_TypeDef;
-
-extern EEPROM_TypeDef EEPROM;
 
 /** 
  * @brief 初始化EEPROM
