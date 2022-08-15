@@ -1,12 +1,11 @@
 #include "UART.h"
 
-
-/** 
- * @brief: 
+/**
+ * @brief:
  * @param UART_S_TypeDef *pUART
  * @param uint8_t *TxBuf
  * @param uint8_t TxBufLen
- * @retval: 
+ * @retval:
  */
 void UART_S_Init(UART_S_TypeDef *const pUART, uint8_t *TxBuf, uint8_t TxBufLen)
 {
@@ -29,20 +28,20 @@ void UART_S_Init(UART_S_TypeDef *const pUART, uint8_t *TxBuf, uint8_t TxBufLen)
     pUART->TxBufLen = TxBufLen;
 }
 
-/** 
+/**
  * @brief 发送一个字节
  * @param UART_S_TypeDef *pUART
  * @param uint8_t dat
  * @retval 0:成功 1:失败
  */
-uint8_t UART_S_SendByte(UART_S_TypeDef * const pUART, uint8_t dat)
+uint8_t UART_S_SendByte(UART_S_TypeDef *const pUART, uint8_t dat)
 {
     uint8_t cnt = 0;
     do
     {
-        if (pUART->TxBusy)//如果在忙状态，就填充进缓存中
+        if (pUART->TxBusy) //如果在忙状态，就填充进缓存中
         {
-            if(pUART->TxBufDataCnt < pUART->TxBufLen)
+            if (pUART->TxBufDataCnt < pUART->TxBufLen)
             {
                 pUART->TxBuf[pUART->TxHeadIndex] = dat;
                 if (++pUART->TxHeadIndex == pUART->TxBufLen)
@@ -64,14 +63,14 @@ uint8_t UART_S_SendByte(UART_S_TypeDef * const pUART, uint8_t dat)
     return 1;
 }
 
-/** 
+/**
  * @brief 发送数据
  * @param UART_S_TypeDef *pUART
  * @param uint8_t *dat
  * @param uint8_t len
  * @retval 发送的字节数
  */
-uint8_t UART_S_SendBytes(UART_S_TypeDef * const pUART, uint8_t *dat, uint8_t len)
+uint8_t UART_S_SendBytes(UART_S_TypeDef *const pUART, uint8_t *dat, uint8_t len)
 {
     for (uint8_t i = 0; i < len; i++)
     {
@@ -83,13 +82,13 @@ uint8_t UART_S_SendBytes(UART_S_TypeDef * const pUART, uint8_t *dat, uint8_t len
     return len;
 }
 
-/** 
+/**
  * @brief 发送字符串
  * @param UART_S_TypeDef *pUART
  * @param uint8_t *dat
  * @retval 发送的字节数
  */
-uint8_t UART_S_SendString(UART_S_TypeDef * const pUART, uint8_t *dat)
+uint8_t UART_S_SendString(UART_S_TypeDef *const pUART, uint8_t *dat)
 {
     uint8_t len = 0;
     while (*dat)
@@ -103,13 +102,13 @@ uint8_t UART_S_SendString(UART_S_TypeDef * const pUART, uint8_t *dat)
     return len;
 }
 
-/** 
+/**
  * @brief 格式化发送字符串
  * @param UART_S_TypeDef *pUART
  * @param char *fmt
  * @retval 发送的字节数
  */
-uint8_t UART_S_Printf(UART_S_TypeDef * const pUART, const char *fmt, ...)
+uint8_t UART_S_Printf(UART_S_TypeDef *const pUART, const char *fmt, ...)
 {
     uint8_t buf[50];
     va_list args;
@@ -119,24 +118,23 @@ uint8_t UART_S_Printf(UART_S_TypeDef * const pUART, const char *fmt, ...)
     return UART_S_SendBytes(pUART, pUART->TxBuf, len);
 }
 
-
-/** 
+/**
  * @brief 模拟串口接收驱动
  * @param UART_S_TypeDef *pUART
- * @retval 
+ * @retval
  */
-void UART_S_ReadDrive(UART_S_TypeDef * const pUART)
+void UART_S_ReadDrive(UART_S_TypeDef *const pUART)
 {
     switch (pUART->RxState)
     {
     case 0:
-        if (HAL_GPIO_Read(&pUART->RX) == 0)//检测到开始位
+        if (HAL_GPIO_Read(&pUART->RX) == 0) //检测到开始位
         {
             pUART->RxState = 1;
         }
         break;
     case 1:
-        if (HAL_GPIO_Read(&pUART->RX) == 0)//第二次检测到开始位，转入接收数据
+        if (HAL_GPIO_Read(&pUART->RX) == 0) //第二次检测到开始位，转入接收数据
         {
             pUART->RxBitCnt = 0;
             pUART->RxHighCnt = 0;
@@ -149,17 +147,17 @@ void UART_S_ReadDrive(UART_S_TypeDef * const pUART)
             pUART->RxState = 0;
         }
         break;
-    case 2://读取数据位
+    case 2: //读取数据位
         if (HAL_GPIO_Read(&pUART->RX) != 0)
         {
             pUART->RxHighCnt++;
         }
-        if(++pUART->RxTestCnt >= 3)//检测一个Bit位三次
+        if (++pUART->RxTestCnt >= 3) //检测一个Bit位三次
         {
             pUART->RxTestCnt = 0;
             pUART->RxData >>= 1;
-            if (pUART->RxHighCnt >= 2)//如果有两次位高就为高电平
-            {    
+            if (pUART->RxHighCnt >= 2) //如果有两次位高就为高电平
+            {
                 pUART->RxData |= 0x80;
             }
             pUART->RxHighCnt = 0;
@@ -170,7 +168,7 @@ void UART_S_ReadDrive(UART_S_TypeDef * const pUART)
             }
         }
         break;
-    case 3://检测通停止位
+    case 3: //检测通停止位
         if (HAL_GPIO_Read(&pUART->RX) != 0)
         {
             pUART->RxHighCnt++;
@@ -179,17 +177,17 @@ void UART_S_ReadDrive(UART_S_TypeDef * const pUART)
         if (pUART->RxTestCnt == 2) //在第二次检测停止位时如果高电平检测到的次数为0次，那么就丢弃这次数据
         {
             if (pUART->RxHighCnt == 0)
-            {    
-                if(pUART->ReadErrorCallback)
+            {
+                if (pUART->ReadErrorCallback)
                 {
                     pUART->ReadErrorCallback(pUART, 1);
                 }
                 pUART->RxState = 0;
             }
         }
-        else if(pUART->RxTestCnt >= 3)
+        else if (pUART->RxTestCnt >= 3)
         {
-            if (pUART->RxHighCnt >= 2)//大于两次认为接收成功
+            if (pUART->RxHighCnt >= 2) //大于两次认为接收成功
             {
                 if (pUART->ReadCallback)
                 {
@@ -198,28 +196,28 @@ void UART_S_ReadDrive(UART_S_TypeDef * const pUART)
                 pUART->RxState = 0;
             }
         }
-    break;
+        break;
     }
 }
 
-/** 
+/**
  * @brief 模拟串口发送驱动
  * @param UART_S_TypeDef *pUART
- * @retval: 
+ * @retval:
  */
-void UART_S_SendDrive(UART_S_TypeDef * const pUART)
+void UART_S_SendDrive(UART_S_TypeDef *const pUART)
 {
     switch (pUART->TxState)
     {
-    case 0://发送开始位
+    case 0: //发送开始位
         if (pUART->TxBusy == 1)
         {
             HAL_GPIO_Low(&pUART->TX);
             pUART->TxState = 1;
         }
         break;
-    case 1://发送数据位
-        if(pUART->RxData & 0x01)
+    case 1: //发送数据位
+        if (pUART->RxData & 0x01)
         {
             HAL_GPIO_High(&pUART->TX);
         }
@@ -228,22 +226,22 @@ void UART_S_SendDrive(UART_S_TypeDef * const pUART)
             HAL_GPIO_Low(&pUART->TX);
         }
         pUART->RxData >>= 1;
-        if(++pUART->TxBitCnt >= 8)
+        if (++pUART->TxBitCnt >= 8)
         {
             pUART->TxBitCnt = 0;
             pUART->TxState = 2;
         }
-    break;
-    case 2://发送停止位
+        break;
+    case 2: //发送停止位
         HAL_GPIO_High(&pUART->TX);
         if (pUART->TxBufDataCnt > 0)
         {
-            if(++pUART->TxTailIndex >= pUART->TxBufLen)
+            if (++pUART->TxTailIndex >= pUART->TxBufLen)
             {
                 pUART->TxTailIndex = 0;
             }
             pUART->TxBufDataCnt--;
-            if(pUART->TxHeadIndex == pUART->TxTailIndex)
+            if (pUART->TxHeadIndex == pUART->TxTailIndex)
             {
                 pUART->TxBusy = 0;
             }
@@ -257,6 +255,6 @@ void UART_S_SendDrive(UART_S_TypeDef * const pUART)
             pUART->TxBusy = 0;
         }
         pUART->TxState = 0;
-    break;
+        break;
     }
 }
