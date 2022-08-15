@@ -13,18 +13,6 @@ EEPROM_TypeDef EEPROM = {
 	},
 };
 
-extern void Delay_MS(uint32_t nTime);
-
-/** 
- * @brief 微秒级延时
- * @param uint32_t t
- * @retval: 
- */
-static __inline void Delay(uint32_t t)
-{
-	Delay_MS(t/1000);
-}
-
 /** 
  * @brief 判断EEPROM是否在忙状态，包含一个开始和发送设备地址的过程
  * @param EEPROM_TypeDef *pEEPROM
@@ -40,7 +28,7 @@ static uint8_t EEPROM_IsBusy(EEPROM_TypeDef *const pEEPROM, uint8_t devAdd)
 		{
 			return 0;
 		}
-		Delay(1000);
+		Delay_ms(1000);
 	}
 	return 1;
 }

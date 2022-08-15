@@ -6,8 +6,8 @@
 #ifndef _EEPROM_H_
 #define _EEPROM_H_
 
-#include "STM32F4xx.h"
 #include "Software_IIC.h"
+#include "HAL_Driver.h"
 
 #define EEPROM_BUSY_CNT 10 //EEPROM忙等待次数
 
@@ -31,7 +31,7 @@ typedef struct
 	uint16_t PageSize;//页大小
 	uint16_t PageCount;//页数
 	uint16_t TotalCapacity;//总容量
-	//因为EEPROM器件型号不同启动传输的操作也有所不同，如AT24C04在启动一次传输时需要占用一个bit的器件地址做寻址地址
+	//因为EEPROM器件型号不同启动传输的操作也有所不同，所以使用的启动方式也有所不同，如AT24C04在启动一次传输时需要占用一个bit的器件地址做寻址地址
 	uint8_t (*EEPROM_StartTransmission)(void* self, uint16_t address);
 } EEPROM_TypeDef;
 

@@ -6,23 +6,15 @@
 #ifndef _SOFTWARE_IIC_H_
 #define _SOFTWARE_IIC_H_
 
-#include "stm32f4xx.h"
+#include "HAL_Driver.h"
 
 #define IIC_DELAY_TIME 1 //延时时间
-
-//包含操作IO口的一些必要信息
-typedef	struct
-{
-	uint32_t		GPIO_CLK;
-	GPIO_TypeDef*	GPIO_PORT; 
-	uint16_t		GPIO_PIN;//0~15
-} IIC_GPIO_TypeDef;
 
 //一个软件IIC设备
 typedef	struct
 {
-	IIC_GPIO_TypeDef	SCL;
-	IIC_GPIO_TypeDef	SDA;
+	HAL_GPIO_TypeDef	SCL;
+	HAL_GPIO_TypeDef	SDA;
 	uint8_t ADD;//设备地址，内部使用时没有移位，只设置了读写位
 } IIC_TypeDef;
 
@@ -80,23 +72,37 @@ extern uint8_t IIC_ReadByte(IIC_TypeDef *const pIIC, uint8_t ack);
  */
 extern void IIC_Read(IIC_TypeDef *const pIIC, uint8_t *dat, uint8_t len);
 /** 
- * @brief 发送写地址并等待应答
+ * @brief 发送写地址
  * @param IIC_TypeDef *pIIC
  * @retval 0：有应答，1：无应答
  */
-extern __inline uint8_t IIC_SendWriteAddress(IIC_TypeDef *const pIIC);
+__STATIC_FORCEINLINE uint8_t IIC_SendWriteAddress(IIC_TypeDef *const pIIC)
+{
+    IIC_SendByte(pIIC, pIIC->ADD);
+    return IIC_Sack(pIIC);
+}
+
 /** 
- * @brief 发送读地址并等待应答
+ * @brief 发送读地址
  * @param IIC_TypeDef *pIIC
  * @retval 0：有应答，1：无应答
  */
-extern __inline uint8_t IIC_SendReadAddress(IIC_TypeDef *const pIIC);
+__STATIC_FORCEINLINE uint8_t IIC_SendReadAddress(IIC_TypeDef *const pIIC)
+{
+    IIC_SendByte(pIIC, pIIC->ADD | 0x01);
+    return IIC_Sack(pIIC);
+}
+
 /** 
  * @brief 发送一个字节并检查从机应答
  * @param IIC_TypeDef *pIIC
  * @param uint8_t dat
  * @retval 0：有应答，1：无应答
  */
-extern __inline uint8_t IIC_SendAndSack(IIC_TypeDef *const pIIC, uint8_t dat);
+__STATIC_FORCEINLINE uint8_t IIC_SendAndSack(IIC_TypeDef *const pIIC, uint8_t dat)
+{
+    IIC_SendByte(pIIC, dat);
+    return IIC_Sack(pIIC);
+}
 
 #endif

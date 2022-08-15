@@ -1,13 +1,12 @@
+/** 
+ * @Author: 时间世纪
+ * @Date: 2022-08-14 20:34:43
+ * @Description: 独立按键驱动程序
+ */
 #include "IndependentKey.h"
 
-static IndependentKey_TypeDef Keys[10];
+static IndependentKey_TypeDef Keys[INDEPENDENT_KEY_COUNT];
 static uint8_t KeyCount = 0;
-
-
-static __inline uint8_t Key_GPIO_Read(IndependentKey_TypeDef * const pKey)
-{
-	return ((pKey->GPIO_PORT->IDR & (1 << pKey->GPIO_PIN)) != 0) ? 1 : 0;
-}
 
 /** 
  * @brief 添加按键 
@@ -18,23 +17,26 @@ static __inline uint8_t Key_GPIO_Read(IndependentKey_TypeDef * const pKey)
  */
 void IndependentKey_Add(uint32_t GPIO_CLK, GPIO_TypeDef* GPIO_PORT, uint16_t GPIO_PIN, uint8_t Number)
 {	
+	if(KeyCount == INDEPENDENT_KEY_COUNT)
+	{
+		LOG_ERROR("IndependentKey_Add: KeyCount > %d", INDEPENDENT_KEY_COUNT);
+		return;
+	}
 	RCC->AHB1ENR |= GPIO_CLK; //开启时钟
-	GPIO_PORT->MODER &= ~(0x00000003 << GPIO_PIN * 2);//设置为输入
-    GPIO_PORT->PUPDR &= ~(0x00000003 << GPIO_PIN * 2);
-    GPIO_PORT->PUPDR |= (0x00000001 << GPIO_PIN * 2);//设置为上拉
-	Keys[KeyCount].GPIO_CLK = GPIO_CLK;
-	Keys[KeyCount].GPIO_PORT = GPIO_PORT;
-	Keys[KeyCount].GPIO_PIN = GPIO_PIN;
+	Keys[KeyCount].Key.GPIO_CLK = GPIO_CLK;
+	Keys[KeyCount].Key.GPIO_PORT = GPIO_PORT;
+	Keys[KeyCount].Key.GPIO_PIN = GPIO_PIN;
 	Keys[KeyCount].Number = Number;
+	HAL_GPIO_SetInput(&(Keys[KeyCount].Key));
 	KeyCount++;
 }
 
 /** 
  * @brief 扫描按键
  * @param 
- * @retval 约定返回的低16位为按键按下的编号，高16位bit0为长按标志
+ * @retval 约定返回的低8位为按键按下的编号，高8位bit0为长按标志
  */
-uint32_t IndependentKey_Scan() 
+uint16_t IndependentKey_Scan() 
 {
 	static uint8_t state = 0;
 	static uint16_t clickTime = 0;
@@ -48,7 +50,7 @@ uint32_t IndependentKey_Scan()
 		// {
 		// 	KeyValue |= (1 << Keys[i].Number);//支持组合键
 		// }
-		if(Key_GPIO_Read(&Keys[i]))
+		if(HAL_GPIO_Read(&Keys[i].Key))
 		{
 			tempKeyValue = Keys[i].Number;
 		}
