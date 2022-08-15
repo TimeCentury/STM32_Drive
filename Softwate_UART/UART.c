@@ -8,12 +8,12 @@
  * @param uint8_t TxBufLen
  * @retval: 
  */
-void UART_S_Init(UART_S_TypeDef *pUART, uint8_t *TxBuf, uint8_t TxBufLen)
+void UART_S_Init(UART_S_TypeDef *const pUART, uint8_t *TxBuf, uint8_t TxBufLen)
 {
-    HAL_GPIO_Init(pUART->RX);
-    HAL_GPIO_Init(pUART->TX);
-    HAL_GPIO_SetInput(pUART->RX);
-    HAL_GPIO_SetOutput(pUART->TX);
+    HAL_GPIO_Init(&pUART->RX);
+    HAL_GPIO_Init(&pUART->TX);
+    HAL_GPIO_SetInput(&pUART->RX);
+    HAL_GPIO_SetOutput(&pUART->TX);
     pUART->RxState = 0;
     pUART->RxTestCnt = 0;
     pUART->RxHighCnt = 0;
@@ -130,13 +130,13 @@ void UART_S_ReadDrive(UART_S_TypeDef * const pUART)
     switch (pUART->RxState)
     {
     case 0:
-        if (HAL_GPIO_Read(pUART->RX) == 0)//检测到开始位
+        if (HAL_GPIO_Read(&pUART->RX) == 0)//检测到开始位
         {
             pUART->RxState = 1;
         }
         break;
     case 1:
-        if (HAL_GPIO_Read(pUART->RX) == 0)//第二次检测到开始位，转入接收数据
+        if (HAL_GPIO_Read(&pUART->RX) == 0)//第二次检测到开始位，转入接收数据
         {
             pUART->RxBitCnt = 0;
             pUART->RxHighCnt = 0;
@@ -150,7 +150,7 @@ void UART_S_ReadDrive(UART_S_TypeDef * const pUART)
         }
         break;
     case 2://读取数据位
-        if (HAL_GPIO_Read(pUART->RX) != 0)
+        if (HAL_GPIO_Read(&pUART->RX) != 0)
         {
             pUART->RxHighCnt++;
         }
@@ -171,7 +171,7 @@ void UART_S_ReadDrive(UART_S_TypeDef * const pUART)
         }
         break;
     case 3://检测通停止位
-        if (HAL_GPIO_Read(pUART->RX) != 0)
+        if (HAL_GPIO_Read(&pUART->RX) != 0)
         {
             pUART->RxHighCnt++;
         }
@@ -182,7 +182,7 @@ void UART_S_ReadDrive(UART_S_TypeDef * const pUART)
             {    
                 if(pUART->ReadErrorCallback)
                 {
-                    pUART->ReadErrorCallback(self, 1);
+                    pUART->ReadErrorCallback(pUART, 1);
                 }
                 pUART->RxState = 0;
             }
@@ -214,18 +214,18 @@ void UART_S_SendDrive(UART_S_TypeDef * const pUART)
     case 0://发送开始位
         if (pUART->TxBusy == 1)
         {
-            HAL_GPIO_Low(pUART->TX);
+            HAL_GPIO_Low(&pUART->TX);
             pUART->TxState = 1;
         }
         break;
     case 1://发送数据位
         if(pUART->RxData & 0x01)
         {
-            HAL_GPIO_High(pUART->TX);
+            HAL_GPIO_High(&pUART->TX);
         }
         else
         {
-            HAL_GPIO_Low(pUART->TX);
+            HAL_GPIO_Low(&pUART->TX);
         }
         pUART->RxData >>= 1;
         if(++pUART->TxBitCnt >= 8)
@@ -235,7 +235,7 @@ void UART_S_SendDrive(UART_S_TypeDef * const pUART)
         }
     break;
     case 2://发送停止位
-        HAL_GPIO_High(pUART->TX);
+        HAL_GPIO_High(&pUART->TX);
         if (pUART->TxBufDataCnt > 0)
         {
             if(++pUART->TxTailIndex >= pUART->TxBufLen)

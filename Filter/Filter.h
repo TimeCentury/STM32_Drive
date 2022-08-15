@@ -3,7 +3,7 @@
 
 typedef struct 
 {
-    
+    unsigned long* Value;
 } Filter_TypeDef;
 
 #endif

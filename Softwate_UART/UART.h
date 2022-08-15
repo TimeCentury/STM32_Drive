@@ -1,7 +1,7 @@
 /** 
  * @Author: 时间世纪
  * @Date: 2022-08-15 15:53:26
- * @LastEditTime: 2022-08-15 18:13:09
+ * @LastEditTime: 2022-08-15 19:07:51
  * @LastEditors: your name
  * @Description: 模拟串口,应定时调用UART_S_ReadDrive，UART_S_SendDrive函数，
  * UART_S_SendDrive定时时间为 1秒 / 想要的波特率
@@ -13,6 +13,8 @@
 #define _UART_H_
 
 #include "HAL_Driver.h"
+#include <stdio.h>
+#include <stdarg.h>
 
 typedef struct
 {
@@ -44,14 +46,14 @@ typedef struct
  * @param uint8_t TxBufLen
  * @retval 
  */
-void UART_S_Init(UART_S_TypeDef *pUART, uint8_t *TxBuf, uint8_t TxBufLen)
+void UART_S_Init(UART_S_TypeDef * const pUART, uint8_t *TxBuf, uint8_t TxBufLen);
 /** 
  * @brief 发送一个字节
  * @param UART_S_TypeDef *pUART
  * @param uint8_t dat
  * @retval 0:成功 1:失败
  */
-uint8_t UART_S_SendByte(UART_S_TypeDef * const pUART, uint8_t dat)
+uint8_t UART_S_SendByte(UART_S_TypeDef * const pUART, uint8_t dat);
 /** 
  * @brief 发送数据
  * @param UART_S_TypeDef *pUART
@@ -59,32 +61,32 @@ uint8_t UART_S_SendByte(UART_S_TypeDef * const pUART, uint8_t dat)
  * @param uint8_t len
  * @retval 发送的字节数
  */
-uint8_t UART_S_SendBytes(UART_S_TypeDef * const pUART, uint8_t *dat, uint8_t len)
+uint8_t UART_S_SendBytes(UART_S_TypeDef * const pUART, uint8_t *dat, uint8_t len);
 /** 
  * @brief 发送字符串
  * @param UART_S_TypeDef *pUART
  * @param uint8_t *dat
  * @retval 发送的字节数
  */
-uint8_t UART_S_SendString(UART_S_TypeDef * const pUART, uint8_t *dat)
+uint8_t UART_S_SendString(UART_S_TypeDef * const pUART, uint8_t *dat);
 /** 
  * @brief 格式化发送字符串
  * @param UART_S_TypeDef *pUART
  * @param char *fmt
  * @retval: 
  */
-uint8_t UART_S_Printf(UART_S_TypeDef * const pUART, const char *fmt, ...)
+uint8_t UART_S_Printf(UART_S_TypeDef * const pUART, const char *fmt, ...);
 /** 
  * @brief 模拟串口接收驱动
  * @param UART_S_TypeDef *pUART
  * @retval 发送的字节数
  */
-void UART_S_ReadDrive(UART_S_TypeDef * const pUART)
+void UART_S_ReadDrive(UART_S_TypeDef * const pUART);
 /** 
  * @brief 模拟串口发送驱动
  * @param UART_S_TypeDef *pUART
  * @retval: 
  */
-void UART_S_SendDrive(UART_S_TypeDef * const pUART)
+void UART_S_SendDrive(UART_S_TypeDef * const pUART);
 
 #endif
