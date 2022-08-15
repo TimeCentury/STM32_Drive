@@ -21,7 +21,7 @@ void IIC_Init(IIC_TypeDef * const pIIC)
 }
 
 /** 
- * @brief 启动一次传输，在SCL高电平是SDA高变低开始传输
+ * @brief 启动一次传输，在SCL高电平时SDA高变低开始传输
  * @param IIC_TypeDef *pIIC
  * @retval 
  */
@@ -29,7 +29,6 @@ void IIC_Start(IIC_TypeDef * const pIIC)
 {
     HAL_GPIO_SetOutput(&pIIC->SDA);
     HAL_GPIO_High(&pIIC->SDA);
-    Delay_us(IIC_DELAY_TIME);
     HAL_GPIO_High(&pIIC->SCL);
     Delay_us(IIC_DELAY_TIME);
     HAL_GPIO_Low(&pIIC->SDA);
@@ -69,7 +68,7 @@ uint8_t IIC_Sack(IIC_TypeDef *const pIIC)
     Delay_us(IIC_DELAY_TIME);
     HAL_GPIO_High(&pIIC->SCL);
     Delay_us(IIC_DELAY_TIME);
-    for (result = 0; result < 10; result++)
+    for (result = 0; result <= 10; result++)
     {
         if (!HAL_GPIO_Read(&pIIC->SDA))
             break;
