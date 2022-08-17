@@ -9,12 +9,12 @@
  */
 void UART_S_Init(UART_S_TypeDef *const pUART, uint8_t *TxBuf, uint8_t TxBufLen)
 {
-    if(pUART->TX != 0)
+    if(pUART->TX.GPIO_CLK != 0)
     {
         HAL_GPIO_Init(&pUART->TX);
         HAL_GPIO_SetOutput(&pUART->TX);
     }
-    if(pUART->RX != 0)
+    if(pUART->RX.GPIO_CLK != 0)
     {
         HAL_GPIO_Init(&pUART->RX);
         HAL_GPIO_SetInput(&pUART->RX);
@@ -39,15 +39,15 @@ void UART_S_Init(UART_S_TypeDef *const pUART, uint8_t *TxBuf, uint8_t TxBufLen)
  * @param UART_S_TypeDef *pUART
  * @retval
  */
-static void UART_S_ChangeIO(UART_S_TypeDef * const pUART)
+void UART_S_ChangeIO(UART_S_TypeDef * const pUART)
 {
     HAL_GPIO_TypeDef temp;
     temp = pUART->RX;
     pUART->RX = pUART->TX;
     pUART->TX = temp;
-    if(pUART->TX != 0)
+    if(pUART->TX.GPIO_CLK != 0)
         HAL_GPIO_SetOutput(&pUART->TX);
-    if(pUART->RX != 0)
+    if(pUART->RX.GPIO_CLK != 0)
         HAL_GPIO_SetInput(&pUART->RX);
     pUART->RxState = 0;//重置状态
     pUART->RxTestCnt = 0;
@@ -162,7 +162,7 @@ void UART_S_ReadDrive(UART_S_TypeDef *const pUART)
     switch (pUART->RxState)
     {
     case 0:
-        if (pUART->RX != 0 && HAL_GPIO_Read(&pUART->RX) == 0) //检测到开始位
+        if (pUART->RX.GPIO_CLK != 0 && HAL_GPIO_Read(&pUART->RX) == 0) //检测到开始位
         {
             pUART->RxState = 1;
         }
