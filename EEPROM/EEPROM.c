@@ -47,7 +47,7 @@ static uint8_t EEPROM_IsBusy(EEPROM_TypeDef *const pEEPROM, uint8_t devAdd)
 		if(i < EEPROM_BUSY_CNT - 1)
 		{
 			IIC_Stop(&pEEPROM->IIC);
-			Delay_ms(1000);
+			Delay_ms(1);
 		}
 	}
 	return 1;
