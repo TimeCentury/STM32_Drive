@@ -13,11 +13,19 @@ EEPROM_TypeDef EEPROM_AT24C02 = {
 	},
 };
 
-EEPROM_TypeDef EEPROM_AT24C256 = {
+EEPROM_TypeDef EEPROM_AT24C16 = {
 	.IIC = {
 		{RCC_AHB1Periph_GPIOH, GPIOH, 4},
 		{RCC_AHB1Periph_GPIOH, GPIOH, 6},
 		0xA0
+	},
+};
+
+EEPROM_TypeDef EEPROM_AT24C256 = {
+	.IIC = {
+		{RCC_AHB1Periph_GPIOH, GPIOH, 4},
+		{RCC_AHB1Periph_GPIOH, GPIOH, 5},
+		0xA8
 	},
 };
 
@@ -32,7 +40,7 @@ static uint8_t EEPROM_IsBusy(EEPROM_TypeDef *const pEEPROM, uint8_t devAdd)
 	for (uint8_t i = 0; i < EEPROM_BUSY_CNT; i++)
 	{
 		IIC_Start(&pEEPROM->IIC);
-		if(IIC_SendWriteAddress(&pEEPROM->IIC) == 0)
+		if(IIC_SendAndSack(&pEEPROM->IIC, devAdd) == 0)
 		{
 			return 0;
 		}
