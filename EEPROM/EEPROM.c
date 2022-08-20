@@ -1,6 +1,6 @@
 /** 
  * @Author: 时间世纪
- * @Date: 2022-08-11 13:46:24
+ * @Date: 2021-08-11 13:46:24
  * @Description: EEPROM驱动程序
  */
 #include "EEPROM.h"
@@ -36,7 +36,11 @@ static uint8_t EEPROM_IsBusy(EEPROM_TypeDef *const pEEPROM, uint8_t devAdd)
 		{
 			return 0;
 		}
-		Delay_ms(1000);
+		if(i < EEPROM_BUSY_CNT - 1)
+		{
+			IIC_Stop(&pEEPROM->IIC);
+			Delay_ms(1000);
+		}
 	}
 	return 1;
 }
