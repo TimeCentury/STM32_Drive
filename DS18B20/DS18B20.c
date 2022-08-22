@@ -79,6 +79,24 @@ static void OneWire_SendByte(OneWire_TypeDef * const pOneWire, uint8_t dat)
 }
 
 /** 
+ * @brief 接收一个位数据
+ * @param OneWire_TypeDef *pOneWire
+ * @retval: 
+ */
+static uint8_t OneWire_ReadBit(OneWire_TypeDef * const pOneWire)
+{
+    uint8_t Bit = 0;
+    HAL_GPIO_SetOutput(&pOneWire->DIO);
+    HAL_GPIO_Low(&pOneWire->DIO);
+    Delay_us(5);
+    HAL_GPIO_SetInput(&pOneWire->DIO);
+    Delay_us(10);
+    Bit = HAL_GPIO_Read(&pOneWire->DIO);
+    Delay_us(60);
+    return Bit;
+}
+
+/** 
  * @brief 从OneWire读取一个字节 
  * @param OneWire_TypeDef *pOneWire
  * @retval: 
@@ -117,6 +135,16 @@ uint8_t DS18B20_Convert(DS18B20_TypeDef * const pDS18B20)
     OneWire_SendByte(&pDS18B20->DQ, 0xCC);//发送跳过ROM命令
     OneWire_SendByte(&pDS18B20->DQ, 0x44);//发送转换命令
     return 0;
+}
+
+/** 
+ * @brief 检测温度转换是否完成
+ * @param DS18B20_TypeDef *pDS18B20
+ * @retval 0:转换中 1:转换完成
+ */
+uint8_t DS18B20_IsConvertFinish(DS18B20_TypeDef * const pDS18B20)
+{
+    return OneWire_ReadBit(&pDS18B20->DQ);
 }
 
 /** 

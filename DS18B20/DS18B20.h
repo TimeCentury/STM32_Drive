@@ -26,6 +26,12 @@ extern void DS18B20_INIT(DS18B20_TypeDef * const pDS18B20);
  */
 extern uint8_t DS18B20_Convert(DS18B20_TypeDef * const pDS18B20);
 /** 
+ * @brief 检测温度转换是否完成,在调用DS18B20_Convert启动温度转换后调用此函数检测是否完成
+ * @param DS18B20_TypeDef *pDS18B20
+ * @retval 0:转换中 1:转换完成
+ */
+uint8_t DS18B20_IsConvertFinish(DS18B20_TypeDef * const pDS18B20);
+/** 
  * @brief 读取温度值
  * @param DS18B20_TypeDef *pDS18B20
  * @param float *temperature 温度值
